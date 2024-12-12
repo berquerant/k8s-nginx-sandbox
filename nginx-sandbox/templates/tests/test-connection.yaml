@@ -13,6 +13,7 @@
 {{- $httpbinService := printf "%s.%s.%s:%d" $httpbinServiceName $namespace $serviceSuffix $httpbinPort -}}
 {{- $image := printf "%s:%s" .Values.bastion.image.repository .Values.bastion.image.tag -}}
 {{- $testName := printf "%s-test-connection" (include "nginx-sandbox.fullname" .) -}}
+{{- $release := .Release.Name -}}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -43,7 +44,7 @@ spec:
           kubectl version
 
           wait() {
-            kubectl -n {{ $namespace }} wait --timeout=60s --for=condition=ready pod -l 'app.kubernetes.io/instance=nginx-sandbox-0' -l 'app!=test'
+            kubectl -n {{ $namespace }} wait --timeout=60s --for=condition=ready pod -l 'app.kubernetes.io/instance={{ $release }}' -l 'app!=test'
           }
 
           cnt=0
