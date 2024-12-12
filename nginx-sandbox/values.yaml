@@ -22,8 +22,8 @@ nginx:
   imagePullSecrets: []
   securityContext:
     runAsNonRoot: true
-    runAsUser: 101 # nginx
-    runAsGroup: 101 # nginx
+    runAsUser: 101  # nginx
+    runAsGroup: 101  # nginx
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
   # nginx.debug -- Enable nginx debug logs
@@ -73,8 +73,8 @@ bastion:
   imagePullSecrets: []
   securityContext:
     runAsNonRoot: true
-    runAsUser: 100 # curl_user
-    runAsGroup: 101 # curl_group
+    runAsUser: 100  # curl_user
+    runAsGroup: 101  # curl_group
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
   labels: {}
