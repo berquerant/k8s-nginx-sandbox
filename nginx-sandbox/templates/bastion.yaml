@@ -1,0 +1,74 @@
+{{- if .Values.bastion.enabled }}
+{{- $bastionName := printf "%s-bastion" (include "nginx-sandbox.fullname" .) -}}
+{{- $bastionConf := printf "%s-bastion-conf" (include "nginx-sandbox.fullname" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $bastionName }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "nginx-sandbox.bastionAppLabels" . | nindent 6 }}
+      {{- include "nginx-sandbox.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.bastion.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nginx-sandbox.bastionAppLabels" . | nindent 8 }}
+        {{- include "nginx-sandbox.labels" . | nindent 8 }}
+        {{- with .Values.bastion.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: bastion
+          image: "{{ .Values.bastion.image.repository }}:{{ .Values.bastion.image.tag }}"
+          imagePullPolicy: {{ .Values.bastion.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.bastion.securityContext | nindent 12 }}
+          command:
+            - sh
+          tty: true
+          volumeMounts:
+            - name: bastion-conf
+              mountPath: /usr/local/bin/http
+              readOnly: true
+              subPath: http.sh
+      volumes:
+        - name: bastion-conf
+          configMap:
+            defaultMode: 0777
+            name: {{ $bastionConf }}
+      {{- with .Values.bastion.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.bastion.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.bastion.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.bastion.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $bastionConf }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+data:
+  http.sh: |-
+    {{- tpl (.Files.Get "files/usr/local/bin/http.sh") . | nindent 4 }}
+{{- end }}

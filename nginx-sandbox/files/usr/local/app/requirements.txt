@@ -1,0 +1,8 @@
+uvicorn==0.32.1
+fastapi==0.115.6
+{{/*
+additional app requirements
+*/}}
+{{- with .Values.app.conf.requirements }}
+{{- . -}}
+{{- end }}

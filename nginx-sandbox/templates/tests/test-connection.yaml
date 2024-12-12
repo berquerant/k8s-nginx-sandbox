@@ -1,0 +1,105 @@
+{{- $nginxName := (include "nginx-sandbox.nginxStatefulSetName" .) -}}
+{{- $nginxServiceName := (include "nginx-sandbox.nginxServiceName" .) -}}
+{{- $nginxPort := (.Values.nginx.portNumber | int) -}}
+{{- $httpbinServiceName := (include "nginx-sandbox.httpbinServiceName" .) -}}
+{{- $httpbinPort := (.Values.httpbin.portNumber | int) -}}
+{{- $appServiceName := (include "nginx-sandbox.appServiceName" .) -}}
+{{- $appPort := (.Values.app.portNumber | int) -}}
+{{- $serviceSuffix := (include "nginx-sandbox.serviceSuffix" .) -}}
+{{- $namespace := .Release.Namespace -}}
+{{- $nginxService := printf "%s.%s.%s:%d" $nginxServiceName $namespace $serviceSuffix $nginxPort -}}
+{{- $nginx1 := printf "%s-1.%s" $nginxName $nginxService -}}
+{{- $appService := printf "%s.%s.%s:%d" $appServiceName $namespace $serviceSuffix $appPort -}}{{- $httpbinService := printf "%s.%s.%s:%d" $httpbinServiceName $namespace $serviceSuffix $httpbinPort -}}
+{{- $image := printf "%s:%s" .Values.bastion.image.repository .Values.bastion.image.tag -}}
+{{- $testName := printf "%s-test-connection" (include "nginx-sandbox.fullname" .) -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ $testName }}"
+  labels:
+    app: test
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  serviceAccountName: {{ $testName }}
+  restartPolicy: Never
+  initContainers:
+    - name: wait-pods-running
+      image: "debian:bookworm-slim"
+      command:
+        - bash
+      args:
+        - "-c"
+        - |
+          set -ex
+          apt-get update
+          apt-get install -y curl
+          # install kubectl
+          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          mv ./kubectl /usr/local/bin/kubectl
+          kubectl version
+
+          wait() {
+            kubectl -n {{ $namespace }} wait --timeout=60s --for=condition=ready pod -l 'app.kubernetes.io/instance=nginx-sandbox-0' -l 'app!=test'
+          }
+
+          cnt=0
+          while ! wait ; do
+            if [ $cnt -gt 5 ] ; then
+              exit 1
+            fi
+            sleep 10
+            cnt=$((cnt+1))
+          done
+  containers:
+    - name: curl
+      image: "{{ $image }}"
+      command:
+        - sh
+      args:
+        - "-c"
+        - |
+          set -ex
+          req() {
+            curl -s -o /dev/null -w '%{http_code}\n' "$@"
+          }
+          req "http://{{ $nginxService }}/"
+          req "http://{{ $appService }}/"
+          req "http://{{ $httpbinService }}/"
+          req "http://{{ $nginx1 }}/"
+          req "http://{{ $nginxService }}/n0/n1/n2/"
+          req "http://{{ $nginxService }}/n0/a/"
+          req "http://{{ $nginxService }}/n0/b/"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $testName }}
+  namespace: {{ $namespace }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ $testName }}
+  namespace: {{ $namespace }}
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ $testName }}
+  namespace: {{ $namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ $testName }}
+roleRef:
+  kind: Role
+  name: {{ $testName }}
+  apiGroup: rbac.authorization.k8s.io

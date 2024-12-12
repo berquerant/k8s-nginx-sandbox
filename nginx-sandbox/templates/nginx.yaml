@@ -1,0 +1,142 @@
+{{- $nginxName := (include "nginx-sandbox.nginxStatefulSetName" .) -}}
+{{- $nginxConf := printf "%s-nginx-conf" (include "nginx-sandbox.fullname" .) -}}
+{{- $nginxDefaultConf := printf "%s-nginx-default-conf" (include "nginx-sandbox.fullname" .) -}}
+{{- $nginxServiceName := (include "nginx-sandbox.nginxServiceName" .) -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $nginxServiceName }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: {{ .Values.nginx.portNumber }}
+      name: {{ .Values.nginx.portName }}
+  clusterIP: None
+  selector:
+    {{- include "nginx-sandbox.nginxAppLabels" . | nindent 4 }}
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $nginxName }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ $nginxServiceName }}
+  replicas: {{ .Values.replicaCount }}
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      {{- include "nginx-sandbox.nginxAppLabels" . | nindent 6 }}
+      {{- include "nginx-sandbox.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.nginx.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nginx-sandbox.nginxAppLabels" . | nindent 8 }}
+        {{- include "nginx-sandbox.labels" . | nindent 8 }}
+        {{- with .Values.nginx.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      initContainers:
+        - name: nginx-syntax
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.nginx.securityContext | nindent 12 }}
+          command:
+            - nginx
+          args:
+            - "-T"
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              readOnly: true
+              subPath: nginx.conf
+            - name: nginx-default-conf
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      containers:
+        - name: nginx
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.nginx.securityContext | nindent 12 }}
+          command:
+            - nginx-debug
+          args:
+            - "-g"
+            - "daemon off;"
+          ports:
+            - name: {{ .Values.nginx.portName }}
+              containerPort: {{ .Values.nginx.portNumber }}
+          livenessProbe:
+            {{- toYaml .Values.nginx.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.nginx.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.nginx.resources | nindent 12 }}
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              readOnly: true
+              subPath: nginx.conf
+            - name: nginx-default-conf
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: {{ $nginxConf }}
+        - name: nginx-default-conf
+          configMap:
+            name: {{ $nginxDefaultConf }}
+        - name: tmp
+          emptyDir: {}
+      restartPolicy: {{ .Values.nginx.restartPolicy }}
+      {{- with .Values.nginx.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nginx.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nginx.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nginx.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $nginxConf }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+data:
+  nginx.conf: |-
+    {{- tpl (.Files.Get "files/etc/nginx/nginx.conf") . | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $nginxDefaultConf }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+data:
+  default.conf: |-
+    {{- tpl (.Files.Get "files/etc/nginx/conf.d/default.conf") . | nindent 4 }}

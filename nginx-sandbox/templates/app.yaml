@@ -1,0 +1,113 @@
+{{- $appName := printf "%s-app" (include "nginx-sandbox.fullname" .) -}}
+{{- $appServiceName := (include "nginx-sandbox.appServiceName" .) -}}
+{{- $appContainerPort := .Values.app.portContainer -}}
+{{- $appConf := printf "%s-app-conf" (include "nginx-sandbox.fullname" .) -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $appServiceName }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: {{ .Values.app.portNumber }}
+      name: {{ .Values.app.portName }}
+      targetPort: {{ $appContainerPort }}
+  selector:
+    {{- include "nginx-sandbox.appAppLabels" . | nindent 4 }}
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $appName }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "nginx-sandbox.appAppLabels" . | nindent 6 }}
+      {{- include "nginx-sandbox.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.app.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nginx-sandbox.appAppLabels" . | nindent 8 }}
+        {{- include "nginx-sandbox.labels" . | nindent 8 }}
+        {{- with .Values.app.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: app
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.app.securityContext | nindent 12 }}
+          command:
+            - bash
+          args:
+            - "-c"
+            - |
+              set -ex
+              cd /usr/local/app
+              pip install -r requirements.txt
+              python -m uvicorn main:app --host 0.0.0.0 
+          ports:
+            - name: {{ .Values.app.portName }}
+              containerPort: {{ $appContainerPort }}
+          livenessProbe:
+            {{- toYaml .Values.app.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.app.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}
+          volumeMounts:
+            - name: local
+              mountPath: /root/.local
+            - name: tmp
+              mountPath: /tmp
+            - name: app-conf
+              mountPath: /usr/local/app
+              readOnly: true
+      volumes:
+        - name: local
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: app-conf
+          configMap:
+            name: {{ $appConf }}
+      restartPolicy: {{ .Values.app.restartPolicy }}
+      {{- with .Values.app.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $appConf }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+data:
+  requirements.txt: |-
+    {{- tpl (.Files.Get "files/usr/local/app/requirements.txt") . | nindent 4 }}
+  main.py: |-
+    {{- tpl (.Files.Get "files/usr/local/app/main.py") . | nindent 4 }}

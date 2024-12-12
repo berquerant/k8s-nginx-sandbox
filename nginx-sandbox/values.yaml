@@ -1,0 +1,148 @@
+# Default values for nginx-sandbox
+
+# nameOverride -- Override name of app
+nameOverride: ""
+# fullnameOverride -- Override the full qualified app name
+fullnameOverride: ""
+# replicaCount -- Number of desired nginx pods of StatefulSet
+replicaCount: 3
+# clusterName -- Name of Kubernetes cluster
+clusterName: ""
+# resolverName -- Name of Service of DNS resolver
+resolverName: kube-dns
+# resolverNamespace -- Namespace which belongs DNS resolver
+resolverNamespace: kube-system
+
+## StatefulSet of nginx
+nginx:
+  image:
+    repository: nginxinc/nginx-unprivileged
+    tag: "1.27.3"
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 101 # nginx
+    runAsGroup: 101 # nginx
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+  # nginx.debug -- Enable nginx debug logs
+  # https://nginx.org/en/docs/debugging_log.html
+  debug: false
+  # nginx.logFormat -- Nginx log format
+  logFormat: |-
+    $remote_addr\t$remote_user\t$time_local\t$request\t$status\t$body_bytes_sent\t$http_referer\t$http_user_agent\t$http_x_forwarded_for
+  conf:
+    # nginx.conf.top -- Nginx top level additional configurations
+    top: |
+      events {
+        worker_connections  1024;
+      }
+    # nginx.conf.http -- Nginx http context additional configurations
+    http: ""
+    # nginx.conf.server -- Nginx server context additional configurations
+    server: |
+      location /status {
+        return 200;
+      }
+  labels: {}
+  annotations: {}
+  resources: {}
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+  portName: http
+  portNumber: "8080"
+  restartPolicy: Always
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+## Deployment for curl
+bastion:
+  # bastion.enabled -- If true, create bastion
+  enabled: true
+  image:
+    repository: curlimages/curl
+    tag: "8.11.0"
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 100 # curl_user
+    runAsGroup: 101 # curl_group
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+  labels: {}
+  annotations: {}
+  resources: {}
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+## Deployment of small python application
+app:
+  image:
+    repository: python
+    tag: "3.13.1"
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+  conf:
+    # app.conf.requirements -- Additional python requirements
+    requirements: ""
+    # app.conf.main -- Additional main script.
+    main: |
+      @app.get("/")
+      def root():
+        return "OK"
+  annotations: {}
+  labels: {}
+  resources: {}
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+  portName: http
+  portNumber: 8080
+  portContainer: 8000
+  restartPolicy: Always
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+httpbin:
+  image:
+    repository: kong/httpbin
+    tag: "0.2.1"
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+  annotations: {}
+  labels: {}
+  resources: {}
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+  portName: http
+  portNumber: 8080
+  portContainer: 80
+  restartPolicy: Always
+  livenessProbe:
+    httpGet:
+      path: /status/200
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /status/200
+      port: http

@@ -1,0 +1,81 @@
+{{- $httpbinName := printf "%s-httpbin" (include "nginx-sandbox.fullname" .) -}}
+{{- $httpbinServiceName := (include "nginx-sandbox.httpbinServiceName" .) -}}
+{{- $httpbinContainerPort := .Values.httpbin.portContainer -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $httpbinServiceName }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: {{ .Values.httpbin.portNumber }}
+      name: {{ .Values.httpbin.portName }}
+      targetPort: {{ $httpbinContainerPort }}
+  selector:
+    {{- include "nginx-sandbox.httpbinAppLabels" . | nindent 4 }}
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $httpbinName }}
+  labels:
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "nginx-sandbox.httpbinAppLabels" . | nindent 6 }}
+      {{- include "nginx-sandbox.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.httpbin.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nginx-sandbox.httpbinAppLabels" . | nindent 8 }}
+        {{- include "nginx-sandbox.labels" . | nindent 8 }}
+        {{- with .Values.httpbin.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: httpbin
+          image: "{{ .Values.httpbin.image.repository }}:{{ .Values.httpbin.image.tag }}"
+          imagePullPolicy: {{ .Values.httpbin.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.httpbin.securityContext | nindent 12 }}
+          ports:
+            - name: {{ .Values.httpbin.portName }}
+              containerPort: {{ $httpbinContainerPort }}
+          livenessProbe:
+            {{- toYaml .Values.httpbin.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.httpbin.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.httpbin.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      restartPolicy: {{ .Values.httpbin.restartPolicy }}
+      {{- with .Values.httpbin.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.httpbin.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.httpbin.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.httpbin.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,12 @@
+apiVersion: v2
+name: nginx-sandbox
+description: A Helm chart for nginx sandbox
+type: application
+maintainers:
+  - name: berquerant
+version: 0.1.0
+appVersion: "1.16.0"
+keywords:
+  - nginx
+  - sandbox
+home: https://github.com/berquerant/k8s-nginx-sandbox
