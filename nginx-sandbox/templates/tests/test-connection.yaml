@@ -9,7 +9,8 @@
 {{- $namespace := .Release.Namespace -}}
 {{- $nginxService := printf "%s.%s.%s:%d" $nginxServiceName $namespace $serviceSuffix $nginxPort -}}
 {{- $nginx1 := printf "%s-1.%s" $nginxName $nginxService -}}
-{{- $appService := printf "%s.%s.%s:%d" $appServiceName $namespace $serviceSuffix $appPort -}}{{- $httpbinService := printf "%s.%s.%s:%d" $httpbinServiceName $namespace $serviceSuffix $httpbinPort -}}
+{{- $appService := printf "%s.%s.%s:%d" $appServiceName $namespace $serviceSuffix $appPort -}}
+{{- $httpbinService := printf "%s.%s.%s:%d" $httpbinServiceName $namespace $serviceSuffix $httpbinPort -}}
 {{- $image := printf "%s:%s" .Values.bastion.image.repository .Values.bastion.image.tag -}}
 {{- $testName := printf "%s-test-connection" (include "nginx-sandbox.fullname" .) -}}
 apiVersion: v1
