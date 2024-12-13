@@ -67,26 +67,5 @@
         "docker"
       ]
     }
-  ],
-  "customManagers": [
-    {
-      "fileMatch": [
-        "^nginx-sandbox/values.yaml$"
-      ],
-      "matchStrings": [
-        "repository: (?<depName>.*)\\s+tag: \"(?<currentValue>.*)\""
-      ],
-      "datasourceTemplate": "docker"
-    },
-    {
-      "fileMatch": [
-        "^nginx-sandbox/files/usr/local/app/requirements.txt$"
-      ],
-      "matchStrings": [
-        "(?<depName>.*)==(?<currentValue>.*)"
-      ],
-      "datasourceTemplate": "pypi",
-      "versioningTemplate": "python"
-    }
   ]
 }
