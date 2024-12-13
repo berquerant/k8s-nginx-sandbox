@@ -11,6 +11,9 @@
     ":automergeDigest",
     "schedule:weekends"
   ],
+  "github-actions": {
+    "enabled": false
+  },
   "platformAutomerge": true,
   "baseBranches": [
     "main"
@@ -42,15 +45,6 @@
     ]
   },
   "packageRules": [
-    {
-      "groupName": "github-actions",
-      "addLabels": [
-        "github-actions"
-      ],
-      "matchManagers": [
-        "github-actions"
-      ]
-    },
     {
       "addLabels": [
         "python"
