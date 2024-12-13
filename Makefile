@@ -1,4 +1,4 @@
-CHART_NAME = "nginx-sandbox"
+CHART_NAME = "charts/nginx-sandbox"
 RELEASE_NAME = "nginx-sandbox-0"
 
 .PHONY: check
