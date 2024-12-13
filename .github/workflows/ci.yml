@@ -10,7 +10,7 @@ on:
   pull_request:
 
 env:
-  RELEASE_NAME: charts/nginx-sandbox
+  CHART_NAME: charts/nginx-sandbox
 
 jobs:
   build:
@@ -29,13 +29,13 @@ jobs:
       - name: Run helm lint
         uses: WyriHaximus/github-action-helm3@v4
         with:
-          exec: helm lint --strict "$RELEASE_NAME"
+          exec: helm lint --strict "$CHART_NAME"
 
       - name: Run chart-testing (lint)
-        run: ct lint --charts "$RELEASE_NAME" --target-branch ${{ github.event.repository.default_branch }}
+        run: ct lint --charts "$CHART_NAME" --target-branch ${{ github.event.repository.default_branch }}
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.10.0
 
       - name: Run chart-testing (install)
-        run: ct install --charts "$RELEASE_NAME" --target-branch ${{ github.event.repository.default_branch }}
+        run: ct install --charts "$CHART_NAME" --target-branch ${{ github.event.repository.default_branch }}
