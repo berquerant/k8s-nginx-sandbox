@@ -10,7 +10,7 @@ on:
   pull_request:
 
 env:
-  RELEASE_NAME: nginx-sandbox
+  RELEASE_NAME: charts/nginx-sandbox
 
 jobs:
   build:
