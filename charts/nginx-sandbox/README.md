@@ -2,6 +2,14 @@
 
 This chart adds a basic configuration of nginx to the cluster for functional verification.
 
+## Install
+
+``` shell
+helm repo add nginx-sandbox https://berquerant.github.io/k8s-nginx-sandbox
+helm repo update
+helm install <RELEASE_NAME> nginx-sandbox/nginx-sandbox
+```
+
 ## Usage
 
 Using the bastion pod allows you to easily test HTTP requests.
