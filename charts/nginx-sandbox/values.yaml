@@ -68,7 +68,7 @@ bastion:
   enabled: true
   image:
     repository: curlimages/curl
-    tag: "8.11.0"
+    tag: "8.11.1"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   securityContext:
