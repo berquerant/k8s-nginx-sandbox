@@ -183,10 +183,11 @@ data:
         access_log  /dev/stdout  main;
         error_log   /dev/stderr debug;
     
+        include /etc/nginx/conf.d/*.conf;
+        
         rewrite_log on;
         sendfile        on;
         keepalive_timeout  65;
-        include /etc/nginx/conf.d/*.conf;
         
     }
     
