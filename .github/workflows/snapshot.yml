@@ -30,13 +30,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: generate manifests
         run: tests/generate.sh gen "$CHART_NAME" generated
-      - name: debug
-        run: ls -alh tests/${CHART_NAME}/generated
       - name: upload manifests
         uses: actions/upload-artifact@v4
         with:
           name: generated-manifests
-          path: tests/${CHART_NAME}/generated
+          path: ./tests/${CHART_NAME}/generated
           retention-days: 1
   test:
     needs:
