@@ -506,6 +506,7 @@ kind: Deployment
 metadata:
   name: tests-overrided-httpbin
   labels:
+    app: httpbin
     helm.sh/chart: nginx-sandbox-0.2.2
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
@@ -562,6 +563,7 @@ kind: StatefulSet
 metadata:
   name: tests-overrided-nginx
   labels:
+    app: nginx
     helm.sh/chart: nginx-sandbox-0.2.2
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests

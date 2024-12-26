@@ -508,6 +508,7 @@ kind: Deployment
 metadata:
   name: tests-nginx-sandbox-httpbin
   labels:
+    app: httpbin
     helm.sh/chart: nginx-sandbox-0.2.2
     app.kubernetes.io/name: nginx-sandbox
     app.kubernetes.io/instance: tests
@@ -564,6 +565,7 @@ kind: StatefulSet
 metadata:
   name: tests-nginx-sandbox-nginx
   labels:
+    app: nginx
     helm.sh/chart: nginx-sandbox-0.2.2
     app.kubernetes.io/name: nginx-sandbox
     app.kubernetes.io/instance: tests
