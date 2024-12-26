@@ -9,8 +9,8 @@ generate() {
     local -r _chart="$1"
     local -r _dest="$2"
     local -r _value_file="$3"
-    echo "[generate] ${_value_file}" > /dev/stderr
     local -r _dest_file="${d}/${_chart}/${_dest}/$(basename "$_value_file")"
+    echo "[generate] ${_value_file} -> ${_dest_file}" > /dev/stderr
     mkdir -p "$(dirname "$_dest_file")"
     helm template "$release_name" "charts/${_chart}" --values "$_value_file" > "$_dest_file"
 }
