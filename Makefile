@@ -23,3 +23,7 @@ test: lint reload
 .PHONY: lint
 lint:
 	helm lint --strict $(CHART_NAME)
+
+.PHONY: golden
+golden:
+	./tests/generate.sh gen $(notdir $(CHART_NAME)) golden

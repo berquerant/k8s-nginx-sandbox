@@ -1,0 +1,8 @@
+app:
+  conf:
+    requirements: |
+      requests
+    main: |
+      @app.get("/")
+      def created():
+        return "created"

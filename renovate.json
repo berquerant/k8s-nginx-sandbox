@@ -11,6 +11,9 @@
     ":automergeDigest",
     "schedule:weekends"
   ],
+  "ignorePaths": [
+    "tests/**"
+  ],
   "github-actions": {
     "enabled": false
   },

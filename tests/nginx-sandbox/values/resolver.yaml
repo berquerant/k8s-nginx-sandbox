@@ -1,0 +1,3 @@
+clusterName: green
+resolverName: coredns
+resolverNamespace: dns

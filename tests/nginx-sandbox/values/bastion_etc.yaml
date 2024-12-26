@@ -1,0 +1,31 @@
+bastion:
+  image:
+    repository: nginx
+    tag: "1.26"
+    pullPolicy: Never
+  imagePullSecrets:
+    - mykey
+  securityContext:
+    runAsNonRoot: false
+  labels:
+    lkey: lvalue
+  annotations:
+    akey: avalue
+  resources:
+    request:
+      cpu: 1
+  tolerations:
+    - key: tkey
+      operator: Exists
+      effect: NoSchedule
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: topology.kubernetes.io/region
+              operator: In
+              values:
+                - moon
+  nodeSelector:
+    env: sandbox

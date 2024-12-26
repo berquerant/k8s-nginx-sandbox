@@ -1,0 +1,43 @@
+app:
+  image:
+    repository: mypython
+    tag: "3.12.1"
+    pullPolicy: Never
+  imagePullSecrets:
+    - mykey
+  securityContext:
+    runAsNonRoot: false
+  labels:
+    lkey: lvalue
+  annotations:
+    akey: avalue
+  resources:
+    request:
+      cpu: 1
+  tolerations:
+    - key: tkey
+      operator: Exists
+      effect: NoSchedule
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: topology.kubernetes.io/region
+              operator: In
+              values:
+                - moon
+  nodeSelector:
+    env: sandbox
+  portName: web
+  portNumber: "8010"
+  portContainer: "8001"
+  restartPolicy: Never
+  livenessProbe:
+    httpGet:
+      path: /created
+      port: web
+  readinessProbe:
+    httpGet:
+      path: /created
+      port: web

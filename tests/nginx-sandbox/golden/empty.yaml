@@ -1,0 +1,726 @@
+---
+# Source: nginx-sandbox/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tests-nginx-sandbox-test-connection
+  namespace: default
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: nginx-sandbox/templates/app.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tests-nginx-sandbox-app-conf
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  requirements.txt: |-
+    uvicorn==0.33.0
+    fastapi==0.115.6
+    
+    
+  main.py: |-
+    from fastapi import FastAPI
+    
+    app = FastAPI()
+    
+    @app.get("/health")
+    def health():
+        return "OK"
+    
+    
+    @app.get("/")
+    def root():
+      return "OK"
+---
+# Source: nginx-sandbox/templates/bastion.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tests-nginx-sandbox-bastion-conf
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  http.sh: |-
+    #!/bin/sh
+    
+    nginx_service='tests-nginx-sandbox-nginx.default.svc.cluster.local:8080'
+    httpbin_service='tests-nginx-sandbox-httpbin.default.svc.cluster.local:8080'
+    app_service='tests-nginx-sandbox-app.default.svc.cluster.local:8080'
+    
+    usage() {
+        cat <<EOS
+    $0 -- do http request
+    
+    $0 (n|nginx) N ARG [CURL_OPTS]
+      curl to N-th pod of StatefulSet of nginx like:
+        curl NGINX_POD_URL/ARG CURL_OPTS
+    
+    $0 (b|bin|httpbin) ARG [CURL_OPTS]
+      curl to httpbin Service like:
+        curl HTTPBIN_SERVICE_URL/ARG CURL_OPTS
+    
+    $0 (a|app) ARG [CURL_OPTS]
+      curl to app Service like:
+        curl APP_SERVICE_URL/ARG CURL_OPTS
+    
+    $0 ARG [CURL_OPTS]
+      curl to nginx Service like:
+        curl NGINX_SERVICE/ARG CURL_OPTS
+    
+    If DEBUG is set, enable debug output like:
+      DEBUG=1 $0 /a/health
+    EOS
+    }
+    
+    nginx_pod() {
+        echo "tests-nginx-sandbox-nginx-${1}.${nginx_service}"
+    }
+    
+    __log() {
+        echo "$*" > /dev/stderr
+    }
+    
+    __err() {
+        __log "$@"
+        return 1
+    }
+    
+    __curl() {
+        case "$1" in
+            n | nginx)
+                n="$2"
+                arg="$3"
+                if [ -z "$n" ] ; then
+                    __err "N is required"
+                fi
+                if [ -z "$arg" ] ; then
+                    __err "ARG is required"
+                fi
+                shift 3
+                curl "http://$(nginx_pod ${n})${arg}" "$@"
+                ;;
+            b | bin | httpbin)
+                arg="$2"
+                if [ -z "$arg" ] ; then
+                    __err "ARG is required"
+                fi
+                shift 2
+                curl "http://${httpbin_service}${arg}" "$@"
+                ;;
+            a | app)
+                arg="$2"
+                if [ -z "$arg" ] ; then
+                    __err "ARG is required"
+                fi
+                shift 2
+                curl "http://${app_service}${arg}" "$@"
+                ;;
+            -h | --help)
+                usage
+                ;;
+            *)
+                arg="$1"
+                if [ -z "$arg" ] ; then
+                    __err "ARG is required"
+                fi
+                shift
+                curl "http://${nginx_service}${arg}" "$@"
+                ;;
+        esac
+    }
+    
+    set -e
+    if [ -n "$DEBUG" ] ; then
+        set -x
+    fi
+    __curl "$@"
+---
+# Source: nginx-sandbox/templates/nginx.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tests-nginx-sandbox-nginx-conf
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  nginx.conf: |-
+    worker_processes  auto;
+    
+    error_log  /var/log/nginx/error.log notice;
+    pid        /tmp/nginx.pid;
+    
+    http {
+        proxy_temp_path /tmp/proxy_temp;
+        client_body_temp_path /tmp/client_temp;
+        fastcgi_temp_path /tmp/fastcgi_temp;
+        uwsgi_temp_path /tmp/uwsgi_temp;
+        scgi_temp_path /tmp/scgi_temp;
+    
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+    
+        log_format main $remote_addr\t$remote_user\t$time_local\t$request\t$status\t$body_bytes_sent\t$http_referer\t$http_user_agent\t$http_x_forwarded_for;
+    
+        access_log  /dev/stdout  main;
+        error_log   /dev/stderr;
+    
+        rewrite_log on;
+        sendfile        on;
+        keepalive_timeout  65;
+        include /etc/nginx/conf.d/*.conf;
+        
+    }
+    
+    events {
+      worker_connections  1024;
+    }
+---
+# Source: nginx-sandbox/templates/nginx.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tests-nginx-sandbox-nginx-default-conf
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  default.conf: |-
+    server {
+      listen 8080;
+      server_name _;
+      # resolve names for Services, Pods
+      resolver kube-dns.kube-system.svc.cluster.local valid=5s;
+    
+      proxy_set_header Host $host;
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header X-Forwarded-For $remote_addr;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header Forwarded "for=${remote_addr};proto=${scheme};host=${host}";
+    
+      location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+      }
+    
+      # for probes
+      location /health {
+        access_log off;
+        return 200;
+      }
+    
+      location /nginx_status {
+        access_log off;
+        stub_status;
+        server_tokens on;
+      }
+    
+      #error_page 404 /404.html;
+      error_page 500 502 503 504 /50x.html;
+      location = /50x.html {
+        root /usr/share/nginx/html;
+      }
+    
+      
+      location /status {
+        return 200;
+      }
+      
+    
+      # pass request from nginx to nginx
+      # e.g. /n1/some/path -> nginx-1/some/path
+      location ~ /n0/(.*) {
+        set $nginx0_upstream tests-nginx-sandbox-nginx-0.tests-nginx-sandbox-nginx.default.svc.cluster.local;
+        proxy_pass http://$nginx0_upstream:8080/$1$is_args$args;
+      }
+      location ~ /n1/(.*) {
+        set $nginx1_upstream tests-nginx-sandbox-nginx-1.tests-nginx-sandbox-nginx.default.svc.cluster.local;
+        proxy_pass http://$nginx1_upstream:8080/$1$is_args$args;
+      }
+      location ~ /n2/(.*) {
+        set $nginx2_upstream tests-nginx-sandbox-nginx-2.tests-nginx-sandbox-nginx.default.svc.cluster.local;
+        proxy_pass http://$nginx2_upstream:8080/$1$is_args$args;
+      }
+    
+      # pass request from nginx to httpbin
+      location ~ /b/(.*) {
+        set $httpbin_upstream tests-nginx-sandbox-httpbin.default.svc.cluster.local;
+        proxy_pass http://$httpbin_upstream:8080/$1$is_args$args;
+      }
+    
+      # pass request from nginx to app
+      location ~ /a/(.*) {
+        set $app_upstream tests-nginx-sandbox-app.default.svc.cluster.local;
+        proxy_pass http://$app_upstream:8080/$1$is_args$args;
+      }
+    }
+---
+# Source: nginx-sandbox/templates/tests/test-connection.yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tests-nginx-sandbox-test-connection
+  namespace: default
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+---
+# Source: nginx-sandbox/templates/tests/test-connection.yaml
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tests-nginx-sandbox-test-connection
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: tests-nginx-sandbox-test-connection
+roleRef:
+  kind: Role
+  name: tests-nginx-sandbox-test-connection
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: nginx-sandbox/templates/app.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: tests-nginx-sandbox-app
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ports:
+    - port: 8080
+      name: http
+      targetPort: 8000
+  selector:
+    app: app
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: nginx-sandbox/templates/httpbin.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: tests-nginx-sandbox-httpbin
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ports:
+    - port: 8080
+      name: http
+      targetPort: 80
+  selector:
+    app: httpbin
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: nginx-sandbox/templates/nginx.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: tests-nginx-sandbox-nginx
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ports:
+    - port: 8080
+      name: http
+  clusterIP: None
+  selector:
+    app: nginx
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: nginx-sandbox/templates/app.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tests-nginx-sandbox-app
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+      app.kubernetes.io/name: nginx-sandbox
+      app.kubernetes.io/instance: tests
+  template:
+    metadata:
+      labels:
+        app: app
+        helm.sh/chart: nginx-sandbox-0.2.2
+        app.kubernetes.io/name: nginx-sandbox
+        app.kubernetes.io/instance: tests
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+        - name: app
+          image: "python:3.13.1"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          command:
+            - bash
+          args:
+            - "-c"
+            - |
+              set -ex
+              cd /usr/local/app
+              pip install -r requirements.txt
+              python -m uvicorn main:app --host 0.0.0.0 
+          ports:
+            - name: http
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {}
+          volumeMounts:
+            - name: local
+              mountPath: /root/.local
+            - name: tmp
+              mountPath: /tmp
+            - name: app-conf
+              mountPath: /usr/local/app
+              readOnly: true
+      volumes:
+        - name: local
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: app-conf
+          configMap:
+            name: tests-nginx-sandbox-app-conf
+      restartPolicy: Always
+---
+# Source: nginx-sandbox/templates/bastion.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tests-nginx-sandbox-bastion
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bastion
+      app.kubernetes.io/name: nginx-sandbox
+      app.kubernetes.io/instance: tests
+  template:
+    metadata:
+      labels:
+        app: bastion
+        helm.sh/chart: nginx-sandbox-0.2.2
+        app.kubernetes.io/name: nginx-sandbox
+        app.kubernetes.io/instance: tests
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+        - name: bastion
+          image: "curlimages/curl:8.11.1"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 101
+            runAsNonRoot: true
+            runAsUser: 100
+          command:
+            - sh
+          tty: true
+          volumeMounts:
+            - name: bastion-conf
+              mountPath: /usr/local/bin/http
+              readOnly: true
+              subPath: http.sh
+      volumes:
+        - name: bastion-conf
+          configMap:
+            defaultMode: 0777
+            name: tests-nginx-sandbox-bastion-conf
+---
+# Source: nginx-sandbox/templates/httpbin.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tests-nginx-sandbox-httpbin
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin
+      app.kubernetes.io/name: nginx-sandbox
+      app.kubernetes.io/instance: tests
+  template:
+    metadata:
+      labels:
+        app: httpbin
+        helm.sh/chart: nginx-sandbox-0.2.2
+        app.kubernetes.io/name: nginx-sandbox
+        app.kubernetes.io/instance: tests
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+        - name: httpbin
+          image: "kong/httpbin:0.2.1"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          ports:
+            - name: http
+              containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /status/200
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /status/200
+              port: http
+          resources:
+            {}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      restartPolicy: Always
+---
+# Source: nginx-sandbox/templates/nginx.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tests-nginx-sandbox-nginx
+  labels:
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  serviceName: tests-nginx-sandbox-nginx
+  replicas: 3
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: nginx
+      app.kubernetes.io/name: nginx-sandbox
+      app.kubernetes.io/instance: tests
+  template:
+    metadata:
+      labels:
+        app: nginx
+        helm.sh/chart: nginx-sandbox-0.2.2
+        app.kubernetes.io/name: nginx-sandbox
+        app.kubernetes.io/instance: tests
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      initContainers:
+        - name: nginx-syntax
+          image: "nginxinc/nginx-unprivileged:1.27.3"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 101
+            runAsNonRoot: true
+            runAsUser: 101
+          command:
+            - nginx
+          args:
+            - "-T"
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              readOnly: true
+              subPath: nginx.conf
+            - name: nginx-default-conf
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      containers:
+        - name: nginx
+          image: "nginxinc/nginx-unprivileged:1.27.3"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 101
+            runAsNonRoot: true
+            runAsUser: 101
+          command:
+            - nginx-debug
+          args:
+            - "-g"
+            - "daemon off;"
+          ports:
+            - name: http
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {}
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              readOnly: true
+              subPath: nginx.conf
+            - name: nginx-default-conf
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: tests-nginx-sandbox-nginx-conf
+        - name: nginx-default-conf
+          configMap:
+            name: tests-nginx-sandbox-nginx-default-conf
+        - name: tmp
+          emptyDir: {}
+      restartPolicy: Always
+---
+# Source: nginx-sandbox/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "tests-nginx-sandbox-test-connection"
+  labels:
+    app: test
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  serviceAccountName: tests-nginx-sandbox-test-connection
+  restartPolicy: Never
+  initContainers:
+    - name: wait-pods-running
+      image: "debian:bookworm-slim"
+      command:
+        - bash
+      args:
+        - "-c"
+        - |
+          set -ex
+          apt-get update
+          apt-get install -y curl
+          # install kubectl
+          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          mv ./kubectl /usr/local/bin/kubectl
+          kubectl version
+
+          wait() {
+            kubectl -n default wait --timeout=60s --for=condition=ready pod -l 'app.kubernetes.io/instance=tests' -l 'app!=test'
+          }
+
+          cnt=0
+          while ! wait ; do
+            if [ $cnt -gt 5 ] ; then
+              exit 1
+            fi
+            sleep 10
+            cnt=$((cnt+1))
+          done
+  containers:
+    - name: curl
+      image: "curlimages/curl:8.11.1"
+      command:
+        - sh
+      args:
+        - "-c"
+        - |
+          set -ex
+          req() {
+            curl -s -o /dev/null -w '%{http_code}\n' "$@"
+          }
+          req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/"
+          req "http://tests-nginx-sandbox-app.default.svc.cluster.local:8080/"
+          req "http://tests-nginx-sandbox-httpbin.default.svc.cluster.local:8080/"
+          req "http://tests-nginx-sandbox-nginx-1.tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/"
+          req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/n0/n1/n2/"
+          req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/n0/a/"
+          req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/n0/b/"

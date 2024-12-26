@@ -1,0 +1,12 @@
+nginx:
+  conf:
+    top: |
+      events {
+        worker_connections  2048;
+      }
+    http: |
+      include /etc/nginx/other.d/*.conf;
+    server: |
+      location /created {
+        return 201;
+      }
