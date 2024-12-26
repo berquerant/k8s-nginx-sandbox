@@ -39,7 +39,10 @@ nginx:
         worker_connections  1024;
       }
     # nginx.conf.http -- Nginx http context additional configurations
-    http: ""
+    http: |
+      rewrite_log on;
+      sendfile        on;
+      keepalive_timeout  65;
     # nginx.conf.server -- Nginx server context additional configurations
     server: |
       location /status {
