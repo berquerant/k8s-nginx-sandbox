@@ -45,8 +45,9 @@ nginx:
       keepalive_timeout  65;
     # nginx.conf.server -- Nginx server context additional configurations
     server: |
-      location /status {
-        return 200;
+      location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
       }
   labels: {}
   annotations: {}
