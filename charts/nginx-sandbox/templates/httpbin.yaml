@@ -21,6 +21,7 @@ kind: Deployment
 metadata:
   name: {{ $httpbinName }}
   labels:
+    {{- include "nginx-sandbox.httpbinAppLabels" . | nindent 4 }}
     {{- include "nginx-sandbox.labels" . | nindent 4 }}
 spec:
   replicas: 1
