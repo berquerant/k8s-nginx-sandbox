@@ -2,6 +2,7 @@
 {{- $nginxConf := printf "%s-nginx-conf" (include "nginx-sandbox.fullname" .) -}}
 {{- $nginxDefaultConf := printf "%s-nginx-default-conf" (include "nginx-sandbox.fullname" .) -}}
 {{- $nginxServiceName := (include "nginx-sandbox.nginxServiceName" .) -}}
+{{- $nginxJobName := (include "nginx-sandbox.nginxJobName" .) -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -141,3 +142,75 @@ metadata:
 data:
   default.conf: |-
     {{- tpl (.Files.Get "files/etc/nginx/conf.d/default.conf") . | nindent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $nginxJobName }}
+  annotations:
+    "helm.sh/hook": post-upgrade,post-install
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    {{- include "nginx-sandbox.nginxJobLabels" . | nindent 4 }}
+    {{- include "nginx-sandbox.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      {{- with .Values.nginx.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nginx-sandbox.nginxJobLabels" . | nindent 8 }}
+        {{- include "nginx-sandbox.labels" . | nindent 8 }}
+        {{- with .Values.nginx.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: nginx-syntax-check
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.nginx.securityContext | nindent 12 }}
+          command:
+            - nginx
+          args:
+            - "-T"
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              readOnly: true
+              subPath: nginx.conf
+            - name: nginx-default-conf
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: {{ $nginxConf }}
+        - name: nginx-default-conf
+          configMap:
+            name: {{ $nginxDefaultConf }}
+        - name: tmp
+          emptyDir: {}
+      restartPolicy: Never
+      {{- with .Values.nginx.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nginx.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nginx.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nginx.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

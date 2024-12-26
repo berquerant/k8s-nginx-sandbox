@@ -79,6 +79,13 @@ Service name of app
 {{- end }}
 
 {{/*
+Job name of nginx
+*/}}
+{{- define "nginx-sandbox.nginxJobName" -}}
+{{- printf "%s-job" (include "nginx-sandbox.fullname" .) -}}
+{{- end}}
+
+{{/*
 Nginx application labels
 */}}
 {{- define "nginx-sandbox.nginxAppLabels" -}}
@@ -104,6 +111,13 @@ App application labels
 */}}
 {{- define "nginx-sandbox.appAppLabels" -}}
 app: app
+{{- end }}
+
+{{/*
+Nginx syntax check application labels
+*/}}
+{{- define "nginx-sandbox.nginxJobLabels" -}}
+app: syntax-check
 {{- end }}
 
 {{/*
