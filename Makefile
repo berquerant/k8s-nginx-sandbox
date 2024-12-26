@@ -7,7 +7,7 @@ check:
 
 .PHONY: apply
 apply:
-	helm install $(RELEASE_NAME) $(CHART_NAME)
+	helm upgrade --install $(RELEASE_NAME) $(CHART_NAME)
 
 .PHONY: delete
 delete:
