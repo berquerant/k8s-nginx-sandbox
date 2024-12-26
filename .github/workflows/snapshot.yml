@@ -16,6 +16,8 @@ jobs:
   generate-matrix:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    outputs:
+      values: ${{ steps.set-matrix.outputs.values }}
     steps:
       - uses: actions/checkout@v4
       - name: generate matrix values
