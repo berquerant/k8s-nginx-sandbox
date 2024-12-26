@@ -220,18 +220,13 @@ data:
       proxy_set_header X-Forwarded-Proto $scheme;
       proxy_set_header Forwarded "for=${remote_addr};proto=${scheme};host=${host}";
     
-      location / {
-        root /usr/share/nginx/html;
-        index index.html index.htm;
-      }
-    
       # for probes
-      location /health {
+      location = /health {
         access_log off;
         return 200;
       }
     
-      location /nginx_status {
+      location = /nginx_status {
         access_log off;
         stub_status;
         server_tokens on;
@@ -242,12 +237,6 @@ data:
       location = /50x.html {
         root /usr/share/nginx/html;
       }
-    
-      
-      location /status {
-        return 200;
-      }
-      
     
       # pass request from nginx to nginx
       # e.g. /n1/some/path -> nginx-1/some/path
@@ -275,6 +264,13 @@ data:
         set $app_upstream tests-nginx-sandbox-app.default.svc.cluster.local;
         proxy_pass http://$app_upstream:8080/$1$is_args$args;
       }
+    
+      
+      location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+      }
+      
     }
 ---
 # Source: nginx-sandbox/templates/tests/test-connection.yaml
