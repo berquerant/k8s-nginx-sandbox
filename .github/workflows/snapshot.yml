@@ -25,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v4
       - name: generate manifests
         run: tests/generate.sh gen "$CHART_NAME" generated
       - name: upload manifests
