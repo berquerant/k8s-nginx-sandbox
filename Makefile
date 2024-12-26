@@ -1,5 +1,5 @@
-CHART_NAME = "charts/nginx-sandbox"
-RELEASE_NAME = "nginx-sandbox-0"
+CHART_NAME = charts/nginx-sandbox
+RELEASE_NAME = nginx-sandbox-0
 
 .PHONY: check
 check:
