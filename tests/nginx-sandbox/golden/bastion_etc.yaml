@@ -743,3 +743,65 @@ spec:
           req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/n0/n1/n2/"
           req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/n0/a/"
           req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/n0/b/"
+---
+# Source: nginx-sandbox/templates/nginx.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tests-nginx-sandbox-job
+  annotations:
+    "helm.sh/hook": post-upgrade,post-install
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    app: syntax-check
+    helm.sh/chart: nginx-sandbox-0.2.2
+    app.kubernetes.io/name: nginx-sandbox
+    app.kubernetes.io/instance: tests
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: syntax-check
+        helm.sh/chart: nginx-sandbox-0.2.2
+        app.kubernetes.io/name: nginx-sandbox
+        app.kubernetes.io/instance: tests
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+        - name: nginx-syntax-check
+          image: "nginxinc/nginx-unprivileged:1.27.3"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 101
+            runAsNonRoot: true
+            runAsUser: 101
+          command:
+            - nginx
+          args:
+            - "-T"
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              readOnly: true
+              subPath: nginx.conf
+            - name: nginx-default-conf
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: tests-nginx-sandbox-nginx-conf
+        - name: nginx-default-conf
+          configMap:
+            name: tests-nginx-sandbox-nginx-default-conf
+        - name: tmp
+          emptyDir: {}
+      restartPolicy: Never
