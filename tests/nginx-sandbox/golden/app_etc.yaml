@@ -391,6 +391,7 @@ spec:
   template:
     metadata:
       annotations:
+        checksum/config: ded052ca21a3aaf554a106504ca55eb9cd158ecb43ccb7ea3610e772f71460ee
         akey: avalue
       labels:
         app: app
@@ -487,6 +488,8 @@ spec:
       app.kubernetes.io/instance: tests
   template:
     metadata:
+      annotations:
+        checksum/config: ed4cc89d2ef20d97bb53a8cce4b7541b00494446efb686705ed7ab5857895cec
       labels:
         app: bastion
         helm.sh/chart: nginx-sandbox-0.3.0
@@ -599,6 +602,8 @@ spec:
       app.kubernetes.io/instance: tests
   template:
     metadata:
+      annotations:
+        checksum/config: 8461f3f9d67aacf02cf0ae99e634d26512aa4c6b2eed51a1b913ffc2adda4f55
       labels:
         app: nginx
         helm.sh/chart: nginx-sandbox-0.3.0
