@@ -31,8 +31,9 @@ spec:
       {{- include "nginx-sandbox.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.app.annotations }}
       annotations:
+        checksum/config: {{ (cat (tpl (.Files.Get "files/usr/local/app/requirements.txt") .) (tpl (.Files.Get "files/usr/local/app/main.py") .)) | sha256sum }}
+      {{- with .Values.app.annotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:

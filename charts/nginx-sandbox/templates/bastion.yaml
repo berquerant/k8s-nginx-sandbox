@@ -15,8 +15,9 @@ spec:
       {{- include "nginx-sandbox.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.bastion.annotations }}
       annotations:
+        checksum/config: {{ tpl (.Files.Get "files/usr/local/bin/http.sh") . | sha256sum }}
+      {{- with .Values.bastion.annotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:

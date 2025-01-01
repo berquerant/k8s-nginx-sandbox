@@ -35,8 +35,9 @@ spec:
       {{- include "nginx-sandbox.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.nginx.annotations }}
       annotations:
+        checksum/config: {{ (cat (tpl (.Files.Get "files/etc/nginx/nginx.conf") .) (tpl (.Files.Get "files/etc/nginx/conf.d/default.conf") .)) | sha256sum }}
+      {{- with .Values.nginx.annotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
