@@ -20,12 +20,7 @@ nginx:
     tag: "1.27.3"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
-  securityContext:
-    runAsNonRoot: true
-    runAsUser: 101  # nginx
-    runAsGroup: 101  # nginx
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
+  securityContext: {}
   # nginx.debug -- Enable nginx debug logs
   # https://nginx.org/en/docs/debugging_log.html
   debug: false
@@ -75,12 +70,7 @@ bastion:
     tag: "8.11.1"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
-  securityContext:
-    runAsNonRoot: true
-    runAsUser: 100  # curl_user
-    runAsGroup: 101  # curl_group
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
+  securityContext: {}
   labels: {}
   annotations: {}
   resources: {}
@@ -94,9 +84,7 @@ app:
     tag: "3.13.1"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
-  securityContext:
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
+  securityContext: {}
   conf:
     # app.conf.requirements -- Additional python requirements
     requirements: ""
@@ -129,9 +117,7 @@ httpbin:
     tag: "0.2.1"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
-  securityContext:
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
+  securityContext: {}
   annotations: {}
   labels: {}
   resources: {}
