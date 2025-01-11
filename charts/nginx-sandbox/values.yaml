@@ -86,8 +86,10 @@ app:
   imagePullSecrets: []
   securityContext: {}
   conf:
-    # app.conf.requirements -- Additional python requirements
-    requirements: ""
+    # app.conf.requirements -- Python requirements
+    requirements: |
+      uvicorn==0.34.0
+      fastapi==0.115.6
     # app.conf.main -- Additional main script.
     main: |
       @app.get("/")
