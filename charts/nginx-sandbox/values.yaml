@@ -16,7 +16,7 @@ resolverNamespace: kube-system
 ## StatefulSet of nginx
 nginx:
   image:
-    repository: nginxinc/nginx-unprivileged
+    repository: nginx
     tag: "1.27.3"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
