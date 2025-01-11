@@ -57,6 +57,8 @@ nginx:
       stub_status;
       server_tokens on;
     }
+  # otherConf -- Content of the other conf file
+  otherConf: ""
   labels: {}
   annotations: {}
   resources: {}
