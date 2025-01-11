@@ -21,7 +21,7 @@ nginx:
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   securityContext: {}
-  nginx.conf: |
+  nginxConf: |
     user  nginx;
     worker_processes  auto;
     pid        /var/run/nginx.pid;
