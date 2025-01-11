@@ -90,8 +90,13 @@ app:
     requirements: |
       uvicorn==0.34.0
       fastapi==0.115.6
-    # app.conf.main -- Additional main script.
+    # app.conf.main -- Main script
     main: |
+      from fastapi import FastAPI
+      app = FastAPI()
+      @app.get("/health")
+      def health():
+        return "OK"
       @app.get("/")
       def root():
         return "OK"
