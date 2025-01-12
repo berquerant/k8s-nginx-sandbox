@@ -1,4 +1,4 @@
 {{/*
 additional app configurations
 */}}
-{{- .Values.app.conf.main }}
+{{- .Values.app.conf.main -}}

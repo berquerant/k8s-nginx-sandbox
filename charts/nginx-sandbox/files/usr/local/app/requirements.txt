@@ -1,4 +1,4 @@
 {{/*
 app requirements
 */}}
-{{- .Values.app.conf.requirements }}
+{{- .Values.app.conf.requirements -}}
