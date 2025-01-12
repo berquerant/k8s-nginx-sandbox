@@ -128,7 +128,7 @@ app:
 httpbin:
   image:
     repository: kong/httpbin
-    tag: "0.2.1"
+    tag: "0.2.3"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   securityContext: {}
