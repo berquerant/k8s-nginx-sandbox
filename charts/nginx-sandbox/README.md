@@ -46,19 +46,18 @@ StatefulSet of nginx.
 
 To change replica count, edit `replicaCount`.
 
-### Server context
+### `/etc/nginx/nginx.conf`
 
-The settings for the nginx server context can be checked with the following command.
+`nginc.nginxConf`.
 
-``` shell
-kubectl exec sts/<RELEASE_NAME>-nginx -- cat /etc/nginx/conf.d/default.conf
-```
+### `/etc/nginx/conf.d/default.conf`
 
-To change nginx settings, edit `nginx.conf.server`.
+The default server which has `nginx.defaultServerName`.
+To add configurations to the server context, edit `nginx.defaultServer`.
 
-### Debug
+### `/etc/nginx/conf.d/other.conf`
 
-To enable debug logs, set `nginx.debug` to `true`.
+`nginx.otherConf`.
 
 ## Bastion
 
