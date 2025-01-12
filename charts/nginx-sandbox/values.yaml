@@ -52,11 +52,6 @@ nginx:
       access_log off;
       return 200;
     }
-    location = /nginx_status {
-      access_log off;
-      stub_status;
-      server_tokens on;
-    }
   # otherConf -- Content of the other conf file
   otherConf: ""
   labels: {}
