@@ -1,8 +1,15 @@
 app:
   conf:
     requirements: |
+      uvicorn==0.34.0
+      fastapi==0.115.6
       requests
     main: |
+      from fastapi import FastAPI
+      app = FastAPI()
+      @app.get("/health")
+      def health():
+        return "OK"
       @app.get("/")
       def created():
         return "created"

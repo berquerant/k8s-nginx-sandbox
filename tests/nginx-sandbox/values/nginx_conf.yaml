@@ -1,12 +1,24 @@
 nginx:
-  conf:
-    top: |
-      events {
-        worker_connections  2048;
-      }
-    http: |
-      include /etc/nginx/other.d/*.conf;
-    server: |
-      location /created {
-        return 201;
-      }
+  nginxConf: |
+    user  nginx;
+    worker_processes  auto;
+    pid        /var/run/nginx.pid;
+    events {
+      worker_connections  1024;
+    }
+    http {
+      include       /etc/nginx/mime.types;
+      default_type  application/octet-stream;
+      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+      access_log  /dev/stdout main;
+      error_log   /dev/stderr debug;
+      sendfile        on;
+      keepalive_timeout  65;
+      include /etc/nginx/conf.d/*.conf;
+    }
+  defaultServer: |
+    location /created {
+      return 201;
+    }
