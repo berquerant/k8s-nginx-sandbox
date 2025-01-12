@@ -15,6 +15,13 @@ generate() {
     helm template "$release_name" "charts/${_chart}" --values "$_value_file" > "$_dest_file"
 }
 
+remove_generated() {
+    local -r _chart="$1"
+    local -r _dest="$2"
+    echo "[remove_generated] ${_chart}/${_dest}" > /dev/stderr
+    rm -rf "${d}/${_chart}/${_dest}"
+}
+
 list_values() {
     local -r _chart="$1"
     find "${d}/${_chart}/values" -type f
@@ -29,6 +36,7 @@ case "$cmd" in
     *)
         readonly chart="$1"
         readonly dest="$2"
+        remove_generated "$chart" "$dest"
         list_values "$chart" | while read -r file ; do
             generate "$chart" "$dest" "$file"
         done

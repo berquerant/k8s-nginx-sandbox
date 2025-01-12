@@ -28,19 +28,11 @@ data:
     uvicorn==0.34.0
     fastapi==0.115.6
     
-    
   main.py: |-
     from fastapi import FastAPI
-    
     app = FastAPI()
-    
     @app.get("/health")
     def health():
-        return "OK"
-    
-    
-    @app.get("/")
-    def root():
       return "OK"
 ---
 # Source: nginx-sandbox/templates/nginx.yaml
@@ -56,36 +48,23 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 data:
   nginx.conf: |-
+    user  nginx;
     worker_processes  auto;
-    
-    error_log  /var/log/nginx/error.log notice;
-    pid        /tmp/nginx.pid;
-    
-    http {
-        proxy_temp_path /tmp/proxy_temp;
-        client_body_temp_path /tmp/client_temp;
-        fastcgi_temp_path /tmp/fastcgi_temp;
-        uwsgi_temp_path /tmp/uwsgi_temp;
-        scgi_temp_path /tmp/scgi_temp;
-    
-        include       /etc/nginx/mime.types;
-        default_type  application/octet-stream;
-    
-        log_format main $remote_addr\t$remote_user\t$time_local\t$request\t$status\t$body_bytes_sent\t$http_referer\t$http_user_agent\t$http_x_forwarded_for;
-    
-        access_log  /dev/stdout  main;
-        error_log   /dev/stderr;
-    
-        include /etc/nginx/conf.d/*.conf;
-        
-        rewrite_log on;
-        sendfile        on;
-        keepalive_timeout  65;
-        
-    }
-    
+    pid        /var/run/nginx.pid;
     events {
       worker_connections  1024;
+    }
+    http {
+      include       /etc/nginx/mime.types;
+      default_type  application/octet-stream;
+      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+      access_log  /dev/stdout main;
+      error_log   /dev/stderr;
+      sendfile        on;
+      keepalive_timeout  65;
+      include /etc/nginx/conf.d/*.conf;
     }
 ---
 # Source: nginx-sandbox/templates/nginx.yaml
@@ -102,69 +81,68 @@ metadata:
 data:
   default.conf: |-
     server {
-      listen 8080;
+      listen 8080 default_server;
       server_name _;
       # resolve names for Services, Pods
       resolver kube-dns.kube-system.svc.cluster.local valid=5s;
-    
-      proxy_set_header Host $host;
-      proxy_set_header X-Forwarded-Host $host;
-      proxy_set_header X-Forwarded-For $remote_addr;
-      proxy_set_header X-Forwarded-Proto $scheme;
-      proxy_set_header Forwarded "for=${remote_addr};proto=${scheme};host=${host}";
-    
-      # for probes
-      location = /health {
-        access_log off;
-        return 200;
-      }
-    
-      location = /nginx_status {
-        access_log off;
-        stub_status;
-        server_tokens on;
-      }
-    
-      #error_page 404 /404.html;
-      error_page 500 502 503 504 /50x.html;
-      location = /50x.html {
-        root /usr/share/nginx/html;
-      }
-    
       # pass request from nginx to nginx
       # e.g. /n1/some/path -> nginx-1/some/path
       location ~ /n0/(.*) {
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Forwarded "for=${remote_addr};proto=${scheme};host=${host}";
         set $nginx0_upstream tests-nginx-sandbox-nginx-0.tests-nginx-sandbox-nginx.default.svc.cluster.local;
         proxy_pass http://$nginx0_upstream:8080/$1$is_args$args;
       }
       location ~ /n1/(.*) {
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Forwarded "for=${remote_addr};proto=${scheme};host=${host}";
         set $nginx1_upstream tests-nginx-sandbox-nginx-1.tests-nginx-sandbox-nginx.default.svc.cluster.local;
         proxy_pass http://$nginx1_upstream:8080/$1$is_args$args;
       }
       location ~ /n2/(.*) {
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Forwarded "for=${remote_addr};proto=${scheme};host=${host}";
         set $nginx2_upstream tests-nginx-sandbox-nginx-2.tests-nginx-sandbox-nginx.default.svc.cluster.local;
         proxy_pass http://$nginx2_upstream:8080/$1$is_args$args;
       }
-    
       # pass request from nginx to httpbin
       location ~ /b/(.*) {
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Forwarded "for=${remote_addr};proto=${scheme};host=${host}";
         set $httpbin_upstream tests-nginx-sandbox-httpbin.default.svc.cluster.local;
         proxy_pass http://$httpbin_upstream:8080/$1$is_args$args;
       }
-    
       # pass request from nginx to app
       location ~ /a/(.*) {
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Forwarded "for=${remote_addr};proto=${scheme};host=${host}";
         set $app_upstream tests-nginx-sandbox-app.default.svc.cluster.local;
         proxy_pass http://$app_upstream:8080/$1$is_args$args;
       }
     
       
-      location / {
-        root /usr/share/nginx/html;
-        index index.html index.htm;
+      location = /health {
+        access_log off;
+        return 200;
       }
       
     }
+  other.conf: |-
 ---
 # Source: nginx-sandbox/templates/tests/test-connection.yaml
 kind: Role
@@ -284,7 +262,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: ded052ca21a3aaf554a106504ca55eb9cd158ecb43ccb7ea3610e772f71460ee
+        checksum/config: 33a12af74c7ec49c1760276dfa7dac17cfcd9d51e406e45038baff28ef903d63
       labels:
         app: app
         helm.sh/chart: nginx-sandbox-0.4.0
@@ -298,8 +276,7 @@ spec:
           image: "python:3.13.1"
           imagePullPolicy: IfNotPresent
           securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            {}
           command:
             - bash
           args:
@@ -374,8 +351,7 @@ spec:
           image: "kong/httpbin:0.2.1"
           imagePullPolicy: IfNotPresent
           securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            {}
           ports:
             - name: http
               containerPort: 80
@@ -421,7 +397,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 08029212e12d355fc6c380d22111fe09b6fa876335940345aeccc5f541cb1f58
+        checksum/config: 620b8213e3384b39f474f949d87ffc212228a92d9fb2dc04a9c038ed2eec8770
       labels:
         app: nginx
         helm.sh/chart: nginx-sandbox-0.4.0
@@ -432,14 +408,10 @@ spec:
     spec:
       initContainers:
         - name: nginx-syntax
-          image: "nginxinc/nginx-unprivileged:1.27.3"
+          image: "nginx:1.27.3"
           imagePullPolicy: IfNotPresent
           securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsGroup: 101
-            runAsNonRoot: true
-            runAsUser: 101
+            {}
           command:
             - nginx
           args:
@@ -456,14 +428,10 @@ spec:
               mountPath: /tmp
       containers:
         - name: nginx
-          image: "nginxinc/nginx-unprivileged:1.27.3"
+          image: "nginx:1.27.3"
           imagePullPolicy: IfNotPresent
           securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsGroup: 101
-            runAsNonRoot: true
-            runAsUser: 101
+            {}
           command:
             - nginx-debug
           args:
@@ -598,14 +566,10 @@ spec:
     spec:
       containers:
         - name: nginx-syntax-check
-          image: "nginxinc/nginx-unprivileged:1.27.3"
+          image: "nginx:1.27.3"
           imagePullPolicy: IfNotPresent
           securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsGroup: 101
-            runAsNonRoot: true
-            runAsUser: 101
+            {}
           command:
             - nginx
           args:

@@ -1,3 +1,5 @@
 nginx:
   defaultServerName: localhost
   defaultClusterResolver: false
+  otherConf: |
+    # comment
