@@ -456,7 +456,7 @@ spec:
     spec:
       containers:
         - name: bastion
-          image: "curlimages/curl:8.11.1"
+          image: "curlimages/curl:8.12.1"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -586,7 +586,7 @@ spec:
     spec:
       initContainers:
         - name: nginx-syntax
-          image: "nginx:1.27.3"
+          image: "nginx:1.27.4"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -606,7 +606,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: nginx
-          image: "nginx:1.27.3"
+          image: "nginx:1.27.4"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -697,7 +697,7 @@ spec:
           done
   containers:
     - name: curl
-      image: "curlimages/curl:8.11.1"
+      image: "curlimages/curl:8.12.1"
       command:
         - sh
       args:
@@ -744,7 +744,7 @@ spec:
     spec:
       containers:
         - name: nginx-syntax-check
-          image: "nginx:1.27.3"
+          image: "nginx:1.27.4"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
