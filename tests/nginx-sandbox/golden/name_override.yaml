@@ -456,7 +456,7 @@ spec:
     spec:
       containers:
         - name: bastion
-          image: "curlimages/curl:8.12.1"
+          image: "curlimages/curl:8.13.0"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -676,7 +676,7 @@ spec:
           done
   containers:
     - name: curl
-      image: "curlimages/curl:8.12.1"
+      image: "curlimages/curl:8.13.0"
       command:
         - sh
       args:
