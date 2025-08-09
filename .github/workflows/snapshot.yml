@@ -63,8 +63,5 @@ jobs:
         with:
           left: golden/${{ matrix.value }}
           right: generated/${{ matrix.value }}
-      - name: show results
-        run: |
-          echo "${{ steps.objdiff.outputs.ids }}" | tr " " "\n"
       - name: exit
         run: exit ${{ steps.objdiff.outputs.status }}
