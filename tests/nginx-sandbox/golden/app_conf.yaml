@@ -384,7 +384,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: "python:3.13.4"
+          image: "python:3.13.5"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -460,7 +460,7 @@ spec:
     spec:
       containers:
         - name: bastion
-          image: "curlimages/curl:8.13.0"
+          image: "curlimages/curl:8.15.0"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -680,7 +680,7 @@ spec:
           done
   containers:
     - name: curl
-      image: "curlimages/curl:8.13.0"
+      image: "curlimages/curl:8.15.0"
       command:
         - sh
       args:
