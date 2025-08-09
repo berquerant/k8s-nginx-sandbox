@@ -54,7 +54,8 @@
       ],
       "matchDatasources": [
         "pypi"
-      ]
+      ],
+      "groupName": "pypi"
     },
     {
       "addLabels": [
@@ -63,6 +64,20 @@
       "matchDatasources": [
         "docker"
       ]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Manage python dependencies",
+      "fileMatch": [
+        "^charts/nginx-sandbox/values.yaml$"
+      ],
+      "matchStrings": [
+        "^      (?<depName>.*)==(?<currentValue>.*)"
+      ],
+      "datasourceTemplate": "pypi",
+      "versioningTemplate": "python"
     }
   ]
 }
