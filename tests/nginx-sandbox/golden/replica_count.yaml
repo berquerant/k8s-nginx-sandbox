@@ -443,7 +443,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: "python:3.13.5"
+          image: "python:3.13.6"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -628,7 +628,7 @@ spec:
     spec:
       initContainers:
         - name: nginx-syntax
-          image: "nginx:1.27.5"
+          image: "nginx:1.29.0"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -648,7 +648,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: nginx
-          image: "nginx:1.27.5"
+          image: "nginx:1.29.0"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -786,7 +786,7 @@ spec:
     spec:
       containers:
         - name: nginx-syntax-check
-          image: "nginx:1.27.5"
+          image: "nginx:1.29.0"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
