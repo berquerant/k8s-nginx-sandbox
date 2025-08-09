@@ -74,7 +74,7 @@
         "^charts/nginx-sandbox/values.yaml$"
       ],
       "matchStrings": [
-        "^      (?<depName>.*)==(?<currentValue>.*)"
+        "      (?<depName>.*)==(?<currentValue>.*)"
       ],
       "datasourceTemplate": "pypi",
       "versioningTemplate": "python"
