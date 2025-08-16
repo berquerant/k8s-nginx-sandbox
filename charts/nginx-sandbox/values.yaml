@@ -91,7 +91,7 @@ bastion:
 app:
   image:
     repository: python
-    tag: "3.13.6"
+    tag: "3.13.7"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   securityContext: {}
