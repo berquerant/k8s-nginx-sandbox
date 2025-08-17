@@ -6,7 +6,7 @@ metadata:
   name: tests-nginx-sandbox-test-connection
   namespace: default
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.1
+    helm.sh/chart: nginx-sandbox-0.6.0
     app.kubernetes.io/name: nginx-sandbox
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
