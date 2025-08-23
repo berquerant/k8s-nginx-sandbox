@@ -39,6 +39,7 @@ jobs:
           CR_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       - name: Push to ghcr
         run: |
+          set -x
           remote_url="oci://ghcr.io/k8s-nginx-sandbox/charts"
           find .cr-release-packages -type f | while read -r package ; do
             name="$(helm show chart "$package" | yq .name)"
