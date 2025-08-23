@@ -40,7 +40,7 @@ jobs:
       - name: Push to ghcr
         run: |
           set -x
-          remote_url="oci://ghcr.io/k8s-nginx-sandbox/charts"
+          remote_url="oci://ghcr.io/berquerant/k8s-nginx-sandbox/charts"
           find .cr-release-packages -type f | while read -r package ; do
             name="$(helm show chart "$package" | yq .name)"
             version="$(helm show chart "$package" | yq .version)"
