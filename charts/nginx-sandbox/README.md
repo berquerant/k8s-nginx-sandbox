@@ -10,6 +10,12 @@ helm repo update
 helm install <RELEASE_NAME> nginx-sandbox/nginx-sandbox
 ```
 
+or
+
+``` shell
+helm install <RELEASE_NAME> oci://ghcr.io/berquerant/k8s-nginx-sandbox/charts/nginx-sandbox
+```
+
 ## Usage
 
 Using the bastion pod allows you to easily test HTTP requests.
