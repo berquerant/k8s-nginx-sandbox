@@ -1,7 +1,6 @@
 name: Snapshot
 
-permissions:
-  contents: read
+permissions: {}
 
 on:
   push:
@@ -24,6 +23,8 @@ jobs:
         id: set-matrix
         run: echo "values=$(.github/generate-snapshot-matrix.sh)" >> "$GITHUB_OUTPUT"
   generate-manifests:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -42,6 +43,8 @@ jobs:
     needs:
       - generate-matrix
       - generate-manifests
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
