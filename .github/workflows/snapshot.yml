@@ -26,6 +26,7 @@ jobs:
       - name: generate matrix values
         id: set-matrix
         run: echo "values=$(.github/generate-snapshot-matrix.sh)" >> "$GITHUB_OUTPUT"
+
   generate-manifests:
     permissions:
       contents: read
@@ -45,6 +46,7 @@ jobs:
           name: generated-manifests
           path: generated
           retention-days: 1
+
   test:
     needs:
       - generate-matrix
