@@ -6,7 +6,7 @@ metadata:
   name: tests-overrided-test-connection
   namespace: default
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -18,7 +18,7 @@ kind: ConfigMap
 metadata:
   name: tests-overrided-app-conf
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -41,7 +41,7 @@ kind: ConfigMap
 metadata:
   name: tests-overrided-bastion-conf
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -148,7 +148,7 @@ kind: ConfigMap
 metadata:
   name: tests-overrided-nginx-conf
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -180,7 +180,7 @@ kind: ConfigMap
 metadata:
   name: tests-overrided-nginx-default-conf
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -282,7 +282,7 @@ kind: Service
 metadata:
   name: tests-overrided-app
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -294,7 +294,7 @@ spec:
       targetPort: 8000
   selector:
     app: app
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -306,7 +306,7 @@ kind: Service
 metadata:
   name: tests-overrided-httpbin
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -318,7 +318,7 @@ spec:
       targetPort: 80
   selector:
     app: httpbin
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -330,7 +330,7 @@ kind: Service
 metadata:
   name: tests-overrided-nginx
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -342,7 +342,7 @@ spec:
   clusterIP: None
   selector:
     app: nginx
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -354,7 +354,7 @@ kind: Deployment
 metadata:
   name: tests-overrided-app
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -372,7 +372,7 @@ spec:
         checksum/config: 944587c964a4ed51c3cd8a0a720a356d569df62f67cc58494b3548d3f840922e
       labels:
         app: app
-        helm.sh/chart: nginx-sandbox-0.6.0
+        helm.sh/chart: nginx-sandbox-0.7.0
         app.kubernetes.io/name: overrided
         app.kubernetes.io/instance: tests
         app.kubernetes.io/version: "1.16.0"
@@ -430,7 +430,7 @@ kind: Deployment
 metadata:
   name: tests-overrided-bastion
   labels:
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -448,7 +448,7 @@ spec:
         checksum/config: 2b5c0b049c7245c60af13ed25869d713c992d82b1760db566d45af02604f591e
       labels:
         app: bastion
-        helm.sh/chart: nginx-sandbox-0.6.0
+        helm.sh/chart: nginx-sandbox-0.7.0
         app.kubernetes.io/name: overrided
         app.kubernetes.io/instance: tests
         app.kubernetes.io/version: "1.16.0"
@@ -481,7 +481,7 @@ metadata:
   name: tests-overrided-httpbin
   labels:
     app: httpbin
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -497,7 +497,7 @@ spec:
     metadata:
       labels:
         app: httpbin
-        helm.sh/chart: nginx-sandbox-0.6.0
+        helm.sh/chart: nginx-sandbox-0.7.0
         app.kubernetes.io/name: overrided
         app.kubernetes.io/instance: tests
         app.kubernetes.io/version: "1.16.0"
@@ -537,7 +537,7 @@ metadata:
   name: tests-overrided-nginx
   labels:
     app: nginx
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -557,7 +557,7 @@ spec:
         checksum/config: 9276f6b71701a947a03c7968ad517781739810342c05020045ab5624156d7b5b
       labels:
         app: nginx
-        helm.sh/chart: nginx-sandbox-0.6.0
+        helm.sh/chart: nginx-sandbox-0.7.0
         app.kubernetes.io/name: overrided
         app.kubernetes.io/instance: tests
         app.kubernetes.io/version: "1.16.0"
@@ -635,7 +635,7 @@ metadata:
   name: "tests-overrided-test-connection"
   labels:
     app: test
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -704,7 +704,7 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
   labels:
     app: syntax-check
-    helm.sh/chart: nginx-sandbox-0.6.0
+    helm.sh/chart: nginx-sandbox-0.7.0
     app.kubernetes.io/name: overrided
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
@@ -715,7 +715,7 @@ spec:
     metadata:
       labels:
         app: syntax-check
-        helm.sh/chart: nginx-sandbox-0.6.0
+        helm.sh/chart: nginx-sandbox-0.7.0
         app.kubernetes.io/name: overrided
         app.kubernetes.io/instance: tests
         app.kubernetes.io/version: "1.16.0"
