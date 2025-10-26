@@ -3,6 +3,22 @@ entries:
   nginx-sandbox:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2025-10-26T12:43:08.395134435Z"
+    description: A Helm chart for nginx sandbox
+    digest: 0e6b19eacb381d163671f3754897f99fd41bde9464e79b44c6967797ed9afe91
+    home: https://github.com/berquerant/k8s-nginx-sandbox
+    keywords:
+    - nginx
+    - sandbox
+    maintainers:
+    - name: berquerant
+    name: nginx-sandbox
+    type: application
+    urls:
+    - https://github.com/berquerant/k8s-nginx-sandbox/releases/download/nginx-sandbox-0.7.0/nginx-sandbox-0.7.0.tgz
+    version: 0.7.0
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2025-08-23T12:42:06.941264008Z"
     description: A Helm chart for nginx sandbox
     digest: b6d338d863132d9430d3c3c3abc15cdd00f976476dfbe734c308c4fd165764b1
@@ -113,4 +129,4 @@ entries:
     urls:
     - https://github.com/berquerant/k8s-nginx-sandbox/releases/download/nginx-sandbox-0.2.1/nginx-sandbox-0.2.1.tgz
     version: 0.2.1
-generated: "2025-08-23T12:42:06.941288644Z"
+generated: "2025-10-26T12:43:08.39516421Z"
