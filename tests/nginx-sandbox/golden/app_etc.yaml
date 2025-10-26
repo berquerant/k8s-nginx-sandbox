@@ -26,7 +26,7 @@ metadata:
 data:
   requirements.txt: |-
     uvicorn==0.37.0
-    fastapi==0.118.0
+    fastapi==0.119.0
     
   main.py: |-
     from fastapi import FastAPI
@@ -369,7 +369,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 309adc69b6d8675f7e744986c475cdc81dfb80f109d7cc63f438b4e788213a0c
+        checksum/config: 944587c964a4ed51c3cd8a0a720a356d569df62f67cc58494b3548d3f840922e
         akey: avalue
       labels:
         app: app
