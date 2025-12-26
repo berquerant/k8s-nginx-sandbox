@@ -443,7 +443,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: "python:3.13.7"
+          image: "python:3.14.1"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
