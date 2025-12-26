@@ -25,8 +25,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 data:
   requirements.txt: |-
-    uvicorn==0.37.0
-    fastapi==0.119.0
+    uvicorn==0.38.0
+    fastapi==0.124.4
     
   main.py: |-
     from fastapi import FastAPI
@@ -432,7 +432,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 944587c964a4ed51c3cd8a0a720a356d569df62f67cc58494b3548d3f840922e
+        checksum/config: d44603504cd9939546db4c27562717fa9a14912b3e9df1b0d580b4006bbd5d7c
       labels:
         app: app
         helm.sh/chart: nginx-sandbox-0.7.0
@@ -443,7 +443,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: "python:3.13.7"
+          image: "python:3.14.1"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -628,7 +628,7 @@ spec:
     spec:
       initContainers:
         - name: nginx-syntax
-          image: "nginx:1.29.1"
+          image: "nginx:1.29.2"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -648,7 +648,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: nginx
-          image: "nginx:1.29.1"
+          image: "nginx:1.29.2"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -786,7 +786,7 @@ spec:
     spec:
       containers:
         - name: nginx-syntax-check
-          image: "nginx:1.29.1"
+          image: "nginx:1.29.2"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
