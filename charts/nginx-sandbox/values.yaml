@@ -77,7 +77,7 @@ bastion:
   enabled: true
   image:
     repository: curlimages/curl
-    tag: "8.16.0"
+    tag: "8.17.0"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   securityContext: {}
@@ -91,15 +91,15 @@ bastion:
 app:
   image:
     repository: python
-    tag: "3.13.7"
+    tag: "3.14.1"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   securityContext: {}
   conf:
     # app.conf.requirements -- Python requirements
     requirements: |
-      uvicorn==0.37.0
-      fastapi==0.119.0
+      uvicorn==0.38.0
+      fastapi==0.124.4
     # app.conf.main -- Main script
     main: |
       from fastapi import FastAPI
