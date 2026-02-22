@@ -379,7 +379,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: "python:3.14.2"
+          image: "python:3.14.3"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
