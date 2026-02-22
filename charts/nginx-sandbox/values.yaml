@@ -91,7 +91,7 @@ bastion:
 app:
   image:
     repository: python
-    tag: "3.14.2"
+    tag: "3.14.3"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   securityContext: {}
@@ -99,7 +99,7 @@ app:
     # app.conf.requirements -- Python requirements
     requirements: |
       uvicorn==0.40.0
-      fastapi==0.128.0
+      fastapi==0.129.0
     # app.conf.main -- Main script
     main: |
       from fastapi import FastAPI
