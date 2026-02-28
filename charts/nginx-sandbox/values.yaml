@@ -98,8 +98,8 @@ app:
   conf:
     # app.conf.requirements -- Python requirements
     requirements: |
-      uvicorn==0.40.0
-      fastapi==0.129.0
+      uvicorn==0.41.0
+      fastapi==0.129.2
     # app.conf.main -- Main script
     main: |
       from fastapi import FastAPI
