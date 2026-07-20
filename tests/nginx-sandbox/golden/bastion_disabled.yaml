@@ -523,7 +523,7 @@ spec:
           done
   containers:
     - name: curl
-      image: "curlimages/curl:8.18.0"
+      image: "curlimages/curl:8.21.0"
       command:
         - sh
       args:
