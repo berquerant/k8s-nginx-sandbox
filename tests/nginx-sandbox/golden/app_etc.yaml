@@ -25,8 +25,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 data:
   requirements.txt: |-
-    uvicorn==0.46.0
-    fastapi==0.136.1
+    uvicorn==0.50.0
+    fastapi==0.139.0
     
   main.py: |-
     from fastapi import FastAPI
@@ -374,7 +374,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: aa45e7ed4414ce38db900936d9ba27868b924daf0cfa31f8dc517726c7c80131
+        checksum/config: 4254a2dce0a9afa0a42e21765e67232136f857e93fd3203b86b5e4f704334f4d
         akey: avalue
       labels:
         app: app
