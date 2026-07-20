@@ -25,8 +25,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 data:
   requirements.txt: |-
-    uvicorn==0.46.0
-    fastapi==0.136.1
+    uvicorn==0.50.0
+    fastapi==0.139.0
     
   main.py: |-
     from fastapi import FastAPI
@@ -34,6 +34,8 @@ data:
     @app.get("/health")
     def health():
       return "OK"
+    
+
 ---
 # Source: nginx-sandbox/templates/bastion.yaml
 apiVersion: v1
@@ -141,6 +143,8 @@ data:
         set -x
     fi
     __curl "$@"
+    
+
 ---
 # Source: nginx-sandbox/templates/nginx.yaml
 apiVersion: v1
@@ -275,6 +279,7 @@ roleRef:
   kind: Role
   name: tests-overrided-test-connection
   apiGroup: rbac.authorization.k8s.io
+
 ---
 # Source: nginx-sandbox/templates/app.yaml
 apiVersion: v1
@@ -369,7 +374,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: aa45e7ed4414ce38db900936d9ba27868b924daf0cfa31f8dc517726c7c80131
+        checksum/config: 4254a2dce0a9afa0a42e21765e67232136f857e93fd3203b86b5e4f704334f4d
       labels:
         app: app
         helm.sh/chart: nginx-sandbox-0.7.1
@@ -380,7 +385,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: "python:3.14.3"
+          image: "python:3.14.5"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -529,6 +534,7 @@ spec:
         - name: tmp
           emptyDir: {}
       restartPolicy: Always
+
 ---
 # Source: nginx-sandbox/templates/nginx.yaml
 apiVersion: apps/v1
@@ -565,7 +571,7 @@ spec:
     spec:
       initContainers:
         - name: nginx-syntax
-          image: "nginx:1.30.0"
+          image: "nginx:1.31.1"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -585,7 +591,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: nginx
-          image: "nginx:1.30.0"
+          image: "nginx:1.31.1"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -723,7 +729,7 @@ spec:
     spec:
       containers:
         - name: nginx-syntax-check
-          image: "nginx:1.30.0"
+          image: "nginx:1.31.1"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -751,3 +757,4 @@ spec:
         - name: tmp
           emptyDir: {}
       restartPolicy: Never
+
