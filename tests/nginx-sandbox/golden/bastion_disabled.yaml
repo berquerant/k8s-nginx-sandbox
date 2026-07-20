@@ -34,6 +34,8 @@ data:
     @app.get("/health")
     def health():
       return "OK"
+    
+
 ---
 # Source: nginx-sandbox/templates/nginx.yaml
 apiVersion: v1
@@ -168,6 +170,7 @@ roleRef:
   kind: Role
   name: tests-nginx-sandbox-test-connection
   apiGroup: rbac.authorization.k8s.io
+
 ---
 # Source: nginx-sandbox/templates/app.yaml
 apiVersion: v1
@@ -372,6 +375,7 @@ spec:
         - name: tmp
           emptyDir: {}
       restartPolicy: Always
+
 ---
 # Source: nginx-sandbox/templates/nginx.yaml
 apiVersion: apps/v1
@@ -408,7 +412,7 @@ spec:
     spec:
       initContainers:
         - name: nginx-syntax
-          image: "nginx:1.30.0"
+          image: "nginx:1.31.1"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -428,7 +432,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: nginx
-          image: "nginx:1.30.0"
+          image: "nginx:1.31.1"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -566,7 +570,7 @@ spec:
     spec:
       containers:
         - name: nginx-syntax-check
-          image: "nginx:1.30.0"
+          image: "nginx:1.31.1"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -594,3 +598,4 @@ spec:
         - name: tmp
           emptyDir: {}
       restartPolicy: Never
+
