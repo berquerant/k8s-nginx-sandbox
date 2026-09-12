@@ -581,7 +581,7 @@ spec:
     spec:
       initContainers:
         - name: nginx-syntax
-          image: "nginx:1.31.1"
+          image: "nginx:1.31.4"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -601,7 +601,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: nginx
-          image: "nginx:1.31.1"
+          image: "nginx:1.31.4"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -740,7 +740,7 @@ spec:
     spec:
       containers:
         - name: nginx-syntax-check
-          image: "nginx:1.31.1"
+          image: "nginx:1.31.4"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
