@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
+
 ---
 # Source: nginx-sandbox/templates/app.yaml
 apiVersion: v1
@@ -68,6 +69,8 @@ data:
       keepalive_timeout  65;
       include /etc/nginx/conf.d/*.conf;
     }
+    
+
 ---
 # Source: nginx-sandbox/templates/nginx.yaml
 apiVersion: v1
@@ -145,6 +148,8 @@ data:
       
     }
   other.conf: |-
+    
+
 ---
 # Source: nginx-sandbox/templates/tests/test-connection.yaml
 kind: Role
@@ -156,6 +161,7 @@ rules:
 - apiGroups: [""]
   resources: ["pods"]
   verbs: ["get", "watch", "list"]
+
 ---
 # Source: nginx-sandbox/templates/tests/test-connection.yaml
 kind: RoleBinding
@@ -195,6 +201,7 @@ spec:
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
+
 ---
 # Source: nginx-sandbox/templates/httpbin.yaml
 apiVersion: v1
@@ -219,6 +226,7 @@ spec:
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
+
 ---
 # Source: nginx-sandbox/templates/nginx.yaml
 apiVersion: v1
@@ -243,6 +251,7 @@ spec:
     app.kubernetes.io/instance: tests
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
+
 ---
 # Source: nginx-sandbox/templates/app.yaml
 apiVersion: apps/v1
@@ -276,7 +285,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: "python:3.14.5"
+          image: "python:3.14.6"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -319,6 +328,7 @@ spec:
           configMap:
             name: tests-nginx-sandbox-app-conf
       restartPolicy: Always
+
 ---
 # Source: nginx-sandbox/templates/httpbin.yaml
 apiVersion: apps/v1
@@ -412,7 +422,7 @@ spec:
     spec:
       initContainers:
         - name: nginx-syntax
-          image: "nginx:1.31.1"
+          image: "nginx:1.31.4"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -432,7 +442,7 @@ spec:
               mountPath: /tmp
       containers:
         - name: nginx
-          image: "nginx:1.31.1"
+          image: "nginx:1.31.4"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
@@ -540,6 +550,7 @@ spec:
           req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/n0/n1/n2/"
           req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/n0/a/"
           req "http://tests-nginx-sandbox-nginx.default.svc.cluster.local:8080/n0/b/"
+
 ---
 # Source: nginx-sandbox/templates/nginx.yaml
 apiVersion: batch/v1
@@ -570,7 +581,7 @@ spec:
     spec:
       containers:
         - name: nginx-syntax-check
-          image: "nginx:1.31.1"
+          image: "nginx:1.31.4"
           imagePullPolicy: IfNotPresent
           securityContext:
             {}
