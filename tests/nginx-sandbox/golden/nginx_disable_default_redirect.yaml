@@ -26,8 +26,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 data:
   requirements.txt: |-
-    uvicorn==0.52.4
-    fastapi==0.141.1
+    uvicorn==0.54.0
+    fastapi==0.142.2
     
   main.py: |-
     from fastapi import FastAPI
@@ -334,7 +334,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 7e0536995d1e819726e24de1ee256482ab21b7b410170f1e31e7fb72afbf73da
+        checksum/config: b070b3d32a146a86e86a849eca28e518fc13b9d2b74aaa3300e4920366403c16
       labels:
         app: app
         helm.sh/chart: nginx-sandbox-0.7.1
