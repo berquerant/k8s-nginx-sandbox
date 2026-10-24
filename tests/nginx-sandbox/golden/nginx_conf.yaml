@@ -27,7 +27,7 @@ metadata:
 data:
   requirements.txt: |-
     uvicorn==0.54.0
-    fastapi==0.142.2
+    fastapi==0.156.4
     
   main.py: |-
     from fastapi import FastAPI
@@ -382,7 +382,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: b070b3d32a146a86e86a849eca28e518fc13b9d2b74aaa3300e4920366403c16
+        checksum/config: 596d9ef346e1ae01eb99e0771d4653312e297009b2723dc5a2afbe5002068429
       labels:
         app: app
         helm.sh/chart: nginx-sandbox-0.7.1
