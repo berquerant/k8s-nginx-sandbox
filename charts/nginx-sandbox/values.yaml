@@ -17,7 +17,7 @@ resolverNamespace: kube-system
 nginx:
   image:
     repository: nginx
-    tag: "1.31.7"
+    tag: "1.31.8"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
   securityContext: {}
